@@ -1,0 +1,27 @@
+server:
+  port: 8080
+springdoc:
+  swagger-ui:
+    version: 4.1.3
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/OnboardingService
+    username: postgres
+    password: "%Eo434Xd"
+  #jpa.hibernate.ddl-auto: update
+  jpa.hibernate.ddl-auto: create
+
+storage:
+  root: glasflair-media-assets
+  credentials:
+    key: "YCAJEGCZOC8L9268c-8LFMk2l"
+    secret: "YCNt_BMuw6MWBXLvRO0eVvtd2aWD6BnZ0IMjUuIf"
+  base-url: "https://storage.yandexcloud.net/glasflair-media-assets/"
+
+manager:
+  credentials:
+    email: chipichipi
+    password: chapachapa
+security:
+  secret: "SMsN2yX3WPJMhSJiUX5Lcjk6OuHelJNtq7XtsAwB6QSMsN2yX3WPJMhSJiUX5Lcjk6OuHelJNtq7XtsAwB6QSMsN2yX3WPJMhSJiUX5Lcjk6OuHelJNtq7XtsAwB6QSMsN2yX3WPJMhSJiUX5Lcjk6OuHelJNtq7XtsAwB6QSMsN2yX3WPJMhSJiUX5Lcjk6OuHelJNtq7XtsAwB6Q"
