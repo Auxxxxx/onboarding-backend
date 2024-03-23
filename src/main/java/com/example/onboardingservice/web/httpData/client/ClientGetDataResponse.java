@@ -1,4 +1,4 @@
-package com.example.onboardingservice.web.httpData.user;
+package com.example.onboardingservice.web.httpData.client;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -21,4 +21,8 @@ public class ClientGetDataResponse {
     private List<String> onboardingStages;
     @Schema(example = "1")
     private Long activeStage;
+    @Schema(example = "line1\nline2")
+    private String usefulInfoContent;
+    @Schema(example = "line1\nline2")
+    private String contactDetailsContent;
 }

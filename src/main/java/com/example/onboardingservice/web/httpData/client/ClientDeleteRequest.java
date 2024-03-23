@@ -1,4 +1,4 @@
-package com.example.onboardingservice.web.httpData.user;
+package com.example.onboardingservice.web.httpData.client;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;

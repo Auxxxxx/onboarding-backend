@@ -1,13 +1,12 @@
 package com.example.onboardingservice.web.controller;
 
-import com.example.onboardingservice.exception.UserIsNotClientException;
-import com.example.onboardingservice.exception.UserNotFoundException;
-import com.example.onboardingservice.exception.WrongListSize;
+import com.example.onboardingservice.exception.*;
 import com.example.onboardingservice.model.Client;
 import com.example.onboardingservice.model.Role;
 import com.example.onboardingservice.model.User;
+import com.example.onboardingservice.service.NoteService;
 import com.example.onboardingservice.service.UserService;
-import com.example.onboardingservice.web.httpData.user.*;
+import com.example.onboardingservice.web.httpData.client.*;
 import com.example.onboardingservice.web.util.RequestData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
@@ -32,6 +31,7 @@ import java.util.stream.Collectors;
 @Tag(name = "Client", description = "Endpoints for CRUD operations on clients")
 public class ClientController {
     private final UserService userService;
+    private final NoteService noteService;
 
     @Secured("MANAGER")
     @Operation(summary = "List clients", description = "Lists all clients in the database")
@@ -76,10 +76,15 @@ public class ClientController {
                     .formAnswers(client.getFormAnswers())
                     .onboardingStages(client.getOnboardingStages())
                     .activeStage(client.getActiveStage())
+                    .usefulInfoContent(noteService.getUsefulInfo(clientEmail).getContent())
+                    .contactDetailsContent(noteService.getContactDetails(clientEmail).getContent())
                     .build();
             return ResponseEntity.ok(response);
         } catch (UserNotFoundException e) {
             log.error("user_not_found: " + clientEmail);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (NoteNotFoundException e) {
+            log.error("note_not_found: " + clientEmail);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }

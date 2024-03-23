@@ -116,7 +116,7 @@ public class NoteController {
                     .usefulInfo(usefulInfo)
                     .build();
             return ResponseEntity.ok(response);
-        } catch (JsonTooLongException e) {
+        } catch (NoteNotFoundException e) {
             log.error("useful_info_not_found: " + clientEmail);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
@@ -148,7 +148,7 @@ public class NoteController {
                     .contactDetails(contactDetails)
                     .build();
             return ResponseEntity.ok(response);
-        } catch (JsonTooLongException e) {
+        } catch (NoteNotFoundException e) {
             log.error("contact_details_not_found: " + clientEmail);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }

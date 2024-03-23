@@ -1,6 +1,6 @@
-package com.example.onboardingservice.web.httpData.user;
+package com.example.onboardingservice.web.httpData.client;
 
-import com.example.onboardingservice.model.Client;
+import com.example.onboardingservice.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +12,6 @@ import java.util.List;
 @Builder
 @Jacksonized
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ClientListResponse {
-    private List<Client> clients;
+public class ClientDeleteResponse {
+    private List<User> clients;
 }
-

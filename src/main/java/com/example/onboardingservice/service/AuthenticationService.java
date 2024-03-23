@@ -34,7 +34,10 @@ public class AuthenticationService {
                 .password(passwordEncoder.encode(password))
                 .build();
         client.setActiveStage(1L);
-        client.setOnboardingStages(Arrays.asList("Beginner", "Common client", "Partner"));
+        client.setOnboardingStages(Arrays.asList(
+                "You are on the first stage. We hope for further cooperation with you",
+                "You are on the second stage. You are now our common client",
+                "You are on the third stage. Thank you for your cooperation!"));
         userRepository.save(client);
 
         try {

@@ -31,14 +31,14 @@ public class NoteService {
         return noteRepository.findMeetingNoteByRecipientAndId(email, noteId).orElseThrow(NoteNotFoundException::new);
     }
 
-    public Note getUsefulInfo(String email) throws JsonTooLongException {
+    public Note getUsefulInfo(String email) throws NoteNotFoundException {
         List<Note> found = noteRepository.findByRecipientAndNoteType(email, NoteType.USEFUL_INFO);
-        return found.stream().findAny().orElseThrow(JsonTooLongException::new);
+        return found.stream().findAny().orElseThrow(NoteNotFoundException::new);
     }
 
-    public Note getContactDetails(String email) throws JsonTooLongException {
+    public Note getContactDetails(String email) throws NoteNotFoundException {
         List<Note> found = noteRepository.findByRecipientAndNoteType(email, NoteType.CONTACT_DETAILS);
-        return found.stream().findAny().orElseThrow(JsonTooLongException::new);
+        return found.stream().findAny().orElseThrow(NoteNotFoundException::new);
     }
 
     public void saveMeetingNote(Long id,
