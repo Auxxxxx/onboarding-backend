@@ -60,10 +60,10 @@ public class ClientController {
     public ResponseEntity<ClientGetDataResponse> get(
             @RequestBody(description = "Client email", required = true)
             @PathVariable("clientEmail") String clientEmail) {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (clientEmail == null || clientEmail.isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (user.getRole() == Role.CLIENT && !user.getEmail().equals(clientEmail)) {
             log.error("returning_client: " + clientEmail + " by: " + user.getEmail());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -106,10 +106,10 @@ public class ClientController {
                     "Only fields with a non-null value passed are updated", required = true)
             @RequestData ClientPostRequest request,
             @PathVariable("clientEmail") String clientEmail) {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (clientEmail == null) {
+        if (clientEmail == null || clientEmail.isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (user.getRole() == Role.CLIENT && !user.getEmail().equals(clientEmail)) {
             log.error("returning_client: " + clientEmail + " by: " + user.getEmail());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -149,10 +149,10 @@ public class ClientController {
     public ResponseEntity<ClientIsFormFilledResponse> isFormFilled(
             @RequestBody(description = "Client email", required = true)
             @RequestData ClientIsFormFilledRequest request) {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (request.getEmail() == null) {
+        if (request.getEmail() == null || request.getEmail().isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (user.getRole() == Role.CLIENT && !user.getEmail().equals(request.getEmail())) {
             log.error("requesting_if_form_filled: " + request.getEmail() + " by: " + user.getEmail());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -173,26 +173,26 @@ public class ClientController {
         }
     }
 
-    @Secured("MANAGER")
-    @Operation(summary = "Delete client", description = "Deletes client by email")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Deleted successfully"),
-            @ApiResponse(responseCode = "403", description = "Forbidden. Accessible only for MANAGER"),
-            @ApiResponse(responseCode = "400", description = "Bad Request. Request field is null"),
-    })
-    @DeleteMapping("{clientEmail}")
-    public ResponseEntity<ClientDeleteResponse> delete(
-            @RequestBody(description = "Email of the client to delete", required = true)
-            @PathVariable("clientEmail") String clientEmail) {
-        if (clientEmail == null || clientEmail.isBlank()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-        log.info("deleting_client: " + clientEmail);
-        var clients = userService.deleteByEmail(clientEmail);
-        var response = ClientDeleteResponse.builder()
-                .clients(clients)
-                .build();
-        return ResponseEntity.ok(response);
-    }
+//    @Secured("MANAGER")
+//    @Operation(summary = "Delete client", description = "Deletes client by email")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "Deleted successfully"),
+//            @ApiResponse(responseCode = "403", description = "Forbidden. Accessible only for MANAGER"),
+//            @ApiResponse(responseCode = "400", description = "Bad Request. Request field is null"),
+//    })
+//    @DeleteMapping("{clientEmail}")
+//    public ResponseEntity<ClientDeleteResponse> delete(
+//            @RequestBody(description = "Email of the client to delete", required = true)
+//            @PathVariable("clientEmail") String clientEmail) {
+//        if (clientEmail == null || clientEmail.isBlank()) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+//        }
+//        log.info("deleting_client: " + clientEmail);
+//        var clients = userService.deleteByEmail(clientEmail);
+//        var response = ClientDeleteResponse.builder()
+//                .clients(clients)
+//                .build();
+//        return ResponseEntity.ok(response);
+//    }
 
 }

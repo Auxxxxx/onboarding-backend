@@ -25,14 +25,14 @@ public class ImageService {
     private final AmazonS3 s3;
 
     public void uploadMediaAssets(MultipartFile[] files, String clientEmail) throws IOException {
-        saveImages(files, clientEmail, "media-assets");
+        saveImages(files, "media-assets", clientEmail);
     }
 
-    public void uploadPaidAdvertisingReports(MultipartFile[] files, String clientEmail) throws IOException {
-        saveImages(files, clientEmail, "paid-advertising-reports");
+    public void uploadPaidAdvertisingReport(MultipartFile[] files, String clientEmail, Long reportId) throws IOException {
+        saveImages(files,"paid-advertising-reports", clientEmail, reportId.toString());
     }
 
-    private void saveImages(MultipartFile[] files, String clientEmail, String folder) throws IOException {
+    private void saveImages(MultipartFile[] files, String... dirPath) throws IOException {
         for (MultipartFile file : files) {
             String filename = file.getOriginalFilename();
             byte[] bI = file.getBytes();
@@ -42,23 +42,43 @@ public class ImageService {
             metadata.setContentLength(bI.length);
             metadata.setContentType("jpg/jpeg/png");
             metadata.setCacheControl("public, max-age=31536000");
-            String path = String.join("/", folder, clientEmail, filename);
+            String path = String.join("/", dirPath) + "/" + filename;
             s3.putObject(bucket, path, fis, metadata);
             s3.setObjectAcl(bucket, path, CannedAccessControlList.PublicRead);
         }
     }
 
     public List<String> getMediaAssets(String clientEmail) {
-        return getImages(clientEmail, "media-assets");
+        return getImageUrls("media-assets", clientEmail);
 
     }
 
-    public List<String> getPaidAdvertisingReports(String clientEmail) {
-        return getImages(clientEmail, "paid-advertising-reports");
+    public List<String> getPaidAdvertisingReport(String clientEmail, Long reportId) {
+        return getImageUrls("paid-advertising-reports", clientEmail, reportId.toString());
     }
 
-    private List<String> getImages(String clientEmail, String folder) {
-        String prefix = String.join("/", folder, clientEmail);
+    public long getPaidAdvertisingReportSize(String clientEmail, Long reportId) {
+        return getImagesSize("paid-advertising-reports", clientEmail, reportId.toString());
+    }
+
+    private List<String> getImageUrls(String... dirPath) {
+        List<S3ObjectSummary> summaries = getImageSummaries(dirPath);
+
+        return summaries.stream()
+                .map(summary -> baseUrl + summary.getKey())
+                .collect(Collectors.toList());
+    }
+
+    private long getImagesSize(String... dirPath) {
+        List<S3ObjectSummary> summaries = getImageSummaries(dirPath);
+
+        return summaries.stream()
+                .mapToLong(S3ObjectSummary::getSize)
+                .sum();
+    }
+
+    private List<S3ObjectSummary> getImageSummaries(String... dirPath) {
+        String prefix = String.join("/", dirPath);
         ObjectListing listing = s3.listObjects(bucket, prefix);
         List<S3ObjectSummary> summaries = listing.getObjectSummaries();
 
@@ -66,22 +86,20 @@ public class ImageService {
             listing = s3.listNextBatchOfObjects(listing);
             summaries.addAll(listing.getObjectSummaries());
         }
-        return summaries.stream()
-                .map(summary -> baseUrl + summary.getKey())
-                .collect(Collectors.toList());
+        return summaries;
     }
 
     public byte[] getMediaAssetsZipped(String clientEmail) throws DownloadingImagesException {
         return getImagesZipped("media-assets", clientEmail);
     }
 
-    public byte[] getPaidAdvertisingReportsZipped(String clientEmail) throws DownloadingImagesException {
-        return getImagesZipped("paid-advertising-reports", clientEmail);
+    public byte[] getPaidAdvertisingReportZipped(String clientEmail, Long reportId) throws DownloadingImagesException {
+        return getImagesZipped("paid-advertising-reports", clientEmail, reportId.toString());
     }
 
 
-    private byte[] getImagesZipped(String folder, String clientEmail) throws DownloadingImagesException {
-        String prefix = String.join("/", folder, clientEmail);
+    private byte[] getImagesZipped(String... dirPath) throws DownloadingImagesException {
+        String prefix = String.join("/", dirPath);
         ObjectListing listing = s3.listObjects(bucket, prefix);
         List<String> keys = new ArrayList<>(listing.getObjectSummaries().stream().map(S3ObjectSummary::getKey).toList());
 

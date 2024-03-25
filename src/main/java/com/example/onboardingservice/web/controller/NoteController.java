@@ -41,10 +41,10 @@ public class NoteController {
     public ResponseEntity<NoteGetMeetingNotesResponse> getMeetingNotes(
             @RequestBody(description = "Client email", required = true)
             @PathVariable("clientEmail") String clientEmail) {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (clientEmail == null || clientEmail.isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!user.getEmail().equals(clientEmail)) {
             log.error("returning_meeting_notes: " + clientEmail + " by: " + user.getEmail());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -69,10 +69,10 @@ public class NoteController {
             @PathVariable("clientEmail") String clientEmail,
             @RequestBody(description = "Note id", required = true)
             @PathVariable("noteId") Long noteId) {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (clientEmail == null || clientEmail.isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!user.getEmail().equals(clientEmail)) {
             log.error("returning_meeting_note_by_id: " + clientEmail + " by: " + user.getEmail());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -101,10 +101,10 @@ public class NoteController {
     public ResponseEntity<NoteGetUsefulInfoResponse> getUsefulInfo(
             @RequestBody(description = "Client email", required = true)
             @PathVariable("clientEmail") String clientEmail) {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (clientEmail == null || clientEmail.isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!user.getEmail().equals(clientEmail)) {
             log.error("returning_useful_info: " + clientEmail + " by: " + user.getEmail());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -133,10 +133,10 @@ public class NoteController {
     public ResponseEntity<NoteGetContactDetailsResponse> getContactDetails(
             @RequestBody(description = "Client email", required = true)
             @PathVariable("clientEmail") String clientEmail) {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (clientEmail == null || clientEmail.isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!user.getEmail().equals(clientEmail)) {
             log.error("returning_contact_details: " + clientEmail + " by: " + user.getEmail());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -173,7 +173,9 @@ public class NoteController {
             @RequestData NotePutMeetingNoteRequest request,
             @PathVariable("recipientEmail") String recipientEmail) {
         if (recipientEmail == null ||
+                recipientEmail.isBlank() ||
                 request.getHeader() == null ||
+                request.getHeader().isBlank() ||
                 request.getContent() == null ||
                 request.getContent().isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -208,6 +210,7 @@ public class NoteController {
             @RequestData NotePutUsefulInfoRequest request,
             @PathVariable("recipientEmail") String recipientEmail) {
         if (recipientEmail == null ||
+                recipientEmail.isBlank() ||
                 request.getContent() == null ||
                 request.getContent().isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -240,6 +243,7 @@ public class NoteController {
             @RequestData NotePutContactDetailsRequest request,
             @PathVariable("recipientEmail") String recipientEmail) {
         if (recipientEmail == null ||
+                recipientEmail.isBlank() ||
                 request.getContent() == null ||
                 request.getContent().isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -256,37 +260,37 @@ public class NoteController {
         }
     }
 
-    @Secured("MANAGER")
-    @Operation(summary = "Delete meeting note", description = "Deletes the meeting note by id")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Deleted successfully"),
-            @ApiResponse(responseCode = "400", description = "Error. " +
-                    "This type of note cannot be deleted " +
-                    "or a request field is null"),
-            @ApiResponse(responseCode = "403", description = "Forbidden. Accessible only for MANAGER"),
-            @ApiResponse(responseCode = "404", description = "Error. The note to delete is not found")
-
-    })
-    @DeleteMapping("/meeting-note/{id}")
-    public ResponseEntity<NoteDeleteMeetingNoteResponse> deleteMeetingNote(
-            @RequestBody(description = "Id of the meeting note to delete", required = true)
-            @PathVariable("id") Long id) {
-        if (id == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-        log.info("deleting_meeting_note: " + id);
-        try {
-            var meetingNotes = noteService.deleteMeetingNoteById(id);
-            var response = NoteDeleteMeetingNoteResponse.builder()
-                    .meetingNotes(meetingNotes)
-                    .build();
-            return ResponseEntity.ok(response);
-        } catch (JsonTooLongException e) {
-            log.error("meeting_note_not_found: " + id);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        } catch (WrongListSize e) {
-            log.error("note_cannot_be_deleted: " + id);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-    }
+//    @Secured("MANAGER")
+//    @Operation(summary = "Delete meeting note", description = "Deletes the meeting note by id")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "Deleted successfully"),
+//            @ApiResponse(responseCode = "400", description = "Error. " +
+//                    "This type of note cannot be deleted " +
+//                    "or a request field is null"),
+//            @ApiResponse(responseCode = "403", description = "Forbidden. Accessible only for MANAGER"),
+//            @ApiResponse(responseCode = "404", description = "Error. The note to delete is not found")
+//
+//    })
+//    @DeleteMapping("/meeting-note/{id}")
+//    public ResponseEntity<NoteDeleteMeetingNoteResponse> deleteMeetingNote(
+//            @RequestBody(description = "Id of the meeting note to delete", required = true)
+//            @PathVariable("id") Long id) {
+//        if (id == null) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+//        }
+//        log.info("deleting_meeting_note: " + id);
+//        try {
+//            var meetingNotes = noteService.deleteMeetingNoteById(id);
+//            var response = NoteDeleteMeetingNoteResponse.builder()
+//                    .meetingNotes(meetingNotes)
+//                    .build();
+//            return ResponseEntity.ok(response);
+//        } catch (JsonTooLongException e) {
+//            log.error("meeting_note_not_found: " + id);
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+//        } catch (WrongListSize e) {
+//            log.error("note_cannot_be_deleted: " + id);
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+//        }
+//    }
 }

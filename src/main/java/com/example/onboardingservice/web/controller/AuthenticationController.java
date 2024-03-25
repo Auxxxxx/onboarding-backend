@@ -41,8 +41,11 @@ public class AuthenticationController {
             @RequestBody(description = "Registration data", required = true)
             @RequestData AuthenticationRegisterRequest request) {
         if (request.getEmail() == null ||
+                request.getEmail().isBlank() ||
                 request.getPassword() == null ||
-                request.getFullName() == null) {
+                request.getPassword().isBlank() ||
+                request.getFullName() == null ||
+                request.getFullName().isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         log.info("registering_client: " + request.getEmail());
@@ -70,7 +73,9 @@ public class AuthenticationController {
             @RequestBody(description = "Email and password", required = true)
             @RequestData AuthenticationSignInRequest request) {
         if (request.getEmail() == null ||
-                request.getPassword() == null) {
+                request.getEmail().isBlank() ||
+                request.getPassword() == null ||
+                request.getPassword().isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         log.info("signing_in: " + request.getEmail());

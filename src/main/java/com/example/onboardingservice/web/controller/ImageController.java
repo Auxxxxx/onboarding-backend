@@ -45,10 +45,12 @@ public class ImageController {
             @PathVariable("clientEmail") String clientEmail,
             @RequestParam("files") MultipartFile[] files) {
         try {
-            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            if (clientEmail == null || files.length == 0) {
+            if (clientEmail == null ||
+                    clientEmail.isBlank() ||
+                    files.length == 0) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             if (!user.getEmail().equals(clientEmail)) {
                 log.error("saving_media_assets: " + clientEmail + " by: " + user.getEmail());
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -97,7 +99,7 @@ public class ImageController {
             @ApiResponse(responseCode = "400", description = "Bad Request. No client specified"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error. Failed to download objects")
     })
-    @GetMapping(value = "/media-assets/zipped/{clientEmail}", produces="application/zip")
+    @GetMapping(value = "/media-assets/zipped/{clientEmail}", produces = "application/zip")
     public ResponseEntity<byte[]> getMediaAssetsZipped(
             @Parameter(description = """
                     Email of the client who had uploaded the images
@@ -130,7 +132,9 @@ public class ImageController {
             @PathVariable("clientEmail") String clientEmail,
             @RequestParam("files") MultipartFile[] files) {
         try {
-            if (clientEmail == null || files.length == 0) {
+            if (clientEmail == null ||
+                    clientEmail.isBlank() ||
+                    files.length == 0) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
             log.info("saving_paid_advertising_reports: " + clientEmail);
@@ -155,10 +159,10 @@ public class ImageController {
                     And email of the client who should see the images
                     """, required = true)
             @PathVariable("clientEmail") String clientEmail) {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (clientEmail == null || clientEmail.isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!user.getEmail().equals(clientEmail)) {
             log.error("fetching_paid_advertising_reports: " + clientEmail + " by: " + user.getEmail());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -179,16 +183,16 @@ public class ImageController {
             @ApiResponse(responseCode = "400", description = "Bad Request. No client specified"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error. Failed to download objects")
     })
-    @GetMapping(value = "/paid-advertising-reports/zipped/{clientEmail}", produces="application/zip")
+    @GetMapping(value = "/paid-advertising-reports/zipped/{clientEmail}", produces = "application/zip")
     public ResponseEntity<byte[]> getPaidAdvertisingReportsZipped(
             @Parameter(description = """
                     Email of the client who will receive the reports
                     """, required = true)
             @PathVariable("clientEmail") String clientEmail) {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (clientEmail == null || clientEmail.isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!user.getEmail().equals(clientEmail)) {
             log.error("fetching_paid_advertising_reports_zipped: " + clientEmail + " by: " + user.getEmail());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
