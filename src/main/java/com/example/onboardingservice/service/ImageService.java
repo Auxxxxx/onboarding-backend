@@ -4,12 +4,14 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
 import com.example.onboardingservice.exception.DownloadingImagesException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -17,6 +19,7 @@ import java.util.zip.ZipOutputStream;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ImageService {
     @Value("${storage.base-url}")
     private String baseUrl;
@@ -43,6 +46,7 @@ public class ImageService {
             metadata.setContentType("jpg/jpeg/png");
             metadata.setCacheControl("public, max-age=31536000");
             String path = String.join("/", dirPath) + "/" + filename;
+            log.info("saving_image: " + path);
             s3.putObject(bucket, path, fis, metadata);
             s3.setObjectAcl(bucket, path, CannedAccessControlList.PublicRead);
         }
@@ -65,7 +69,7 @@ public class ImageService {
         List<S3ObjectSummary> summaries = getImageSummaries(dirPath);
 
         return summaries.stream()
-                .map(summary -> baseUrl + summary.getKey())
+                .map(summary -> baseUrl + summary.getKey().replaceAll(" ", "%"))
                 .collect(Collectors.toList());
     }
 
@@ -112,7 +116,9 @@ public class ImageService {
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
              ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
             for (String key : keys) {
-                ZipEntry zipEntry = new ZipEntry(key);
+                String[] keyPathElements = key.split("/");
+                String fileName = keyPathElements[keyPathElements.length - 1];
+                ZipEntry zipEntry = new ZipEntry(fileName);
                 zipOutputStream.putNextEntry(zipEntry);
 
                 S3ObjectInputStream objectContent = s3.getObject(bucket, key).getObjectContent();

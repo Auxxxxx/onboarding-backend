@@ -19,6 +19,7 @@ public class Report implements Serializable {
     @Id
     @GeneratedValue
     @ToString.Include
+    @JsonIgnore
     private Long id;
     @Schema(example = "Report on advertisement in Facebook")
     private String name;

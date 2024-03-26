@@ -10,7 +10,8 @@ import java.util.Map;
 @AllArgsConstructor
 @Builder
 public class ReportWithImagesDto {
-    private Report report;
+    private Long reportId;
+    private Report reportData;
     private List<String> imageUrls;
     private Long sizeKb;
 }

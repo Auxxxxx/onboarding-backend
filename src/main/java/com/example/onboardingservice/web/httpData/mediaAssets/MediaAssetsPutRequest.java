@@ -1,4 +1,4 @@
-package com.example.onboardingservice.web.httpData.image;
+package com.example.onboardingservice.web.httpData.mediaAssets;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import java.util.Map;
 @Builder
 @Jacksonized
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ImagePutMediaAssetsRequest {
+public class MediaAssetsPutRequest {
     private Map<String, String> imagesBase64;
     private String clientEmail;
 }
