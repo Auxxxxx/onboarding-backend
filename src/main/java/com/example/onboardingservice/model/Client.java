@@ -40,7 +40,7 @@ public class Client extends User {
 
     @JsonIgnore
     @Builder.Default
-    @OneToMany(mappedBy = "recipient", fetch=FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "recipient", fetch=FetchType.LAZY)
     private List<Note> notes = new ArrayList<>();
 
     {

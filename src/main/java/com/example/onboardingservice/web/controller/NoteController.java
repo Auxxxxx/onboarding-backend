@@ -1,9 +1,6 @@
 package com.example.onboardingservice.web.controller;
 
-import com.example.onboardingservice.exception.JsonTooLongException;
-import com.example.onboardingservice.exception.NoteNotFoundException;
-import com.example.onboardingservice.exception.UserNotFoundException;
-import com.example.onboardingservice.exception.WrongListSize;
+import com.example.onboardingservice.exception.*;
 import com.example.onboardingservice.model.Note;
 import com.example.onboardingservice.model.Role;
 import com.example.onboardingservice.model.User;
@@ -261,37 +258,37 @@ public class NoteController {
         }
     }
 
-//    @Secured("MANAGER")
-//    @Operation(summary = "Delete meeting note", description = "Deletes the meeting note by id")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "Deleted successfully"),
-//            @ApiResponse(responseCode = "400", description = "Error. " +
-//                    "This type of note cannot be deleted " +
-//                    "or a request field is null"),
-//            @ApiResponse(responseCode = "403", description = "Forbidden. Accessible only for MANAGER"),
-//            @ApiResponse(responseCode = "404", description = "Error. The note to delete is not found")
-//
-//    })
-//    @DeleteMapping("/meeting-note/{id}")
-//    public ResponseEntity<NoteDeleteMeetingNoteResponse> deleteMeetingNote(
-//            @RequestBody(description = "Id of the meeting note to delete", required = true)
-//            @PathVariable("id") Long id) {
-//        if (id == null) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-//        }
-//        log.info("deleting_meeting_note: " + id);
-//        try {
-//            var meetingNotes = noteService.deleteMeetingNoteById(id);
-//            var response = NoteDeleteMeetingNoteResponse.builder()
-//                    .meetingNotes(meetingNotes)
-//                    .build();
-//            return ResponseEntity.ok(response);
-//        } catch (JsonTooLongException e) {
-//            log.error("meeting_note_not_found: " + id);
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-//        } catch (WrongListSize e) {
-//            log.error("note_cannot_be_deleted: " + id);
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-//        }
-//    }
+    @Secured("MANAGER")
+    @Operation(summary = "Delete meeting note", description = "Deletes the meeting note by id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Deleted successfully"),
+            @ApiResponse(responseCode = "400", description = "Error. " +
+                    "This type of note cannot be deleted " +
+                    "or a request field is null"),
+            @ApiResponse(responseCode = "403", description = "Forbidden. Accessible only for MANAGER"),
+            @ApiResponse(responseCode = "404", description = "Error. The note to delete is not found")
+
+    })
+    @DeleteMapping("/meeting-notes/{id}")
+    public ResponseEntity<NoteDeleteMeetingNoteResponse> deleteMeetingNote(
+            @RequestBody(description = "Id of the meeting note to delete", required = true)
+            @PathVariable("id") Long id) {
+        if (id == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        log.info("deleting_meeting_note: " + id);
+        try {
+            var meetingNotes = noteService.deleteMeetingNoteById(id);
+            var response = NoteDeleteMeetingNoteResponse.builder()
+                    .meetingNotes(meetingNotes)
+                    .build();
+            return ResponseEntity.ok(response);
+        } catch (NoteNotFoundException e) {
+            log.error("meeting_note_not_found: " + id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (NoteCannotBeDeletedException e) {
+            log.error("note_cannot_be_deleted: " + id);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
 }

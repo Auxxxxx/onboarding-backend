@@ -1,15 +1,13 @@
 package com.example.onboardingservice.web.controller;
 
-import com.example.onboardingservice.exception.DownloadingImagesException;
-import com.example.onboardingservice.exception.NoteNotFoundException;
-import com.example.onboardingservice.exception.ReportNotFoundException;
-import com.example.onboardingservice.exception.UserNotFoundException;
+import com.example.onboardingservice.exception.*;
 import com.example.onboardingservice.model.Role;
 import com.example.onboardingservice.model.User;
 import com.example.onboardingservice.service.ImageService;
 import com.example.onboardingservice.service.NoteService;
 import com.example.onboardingservice.service.ReportService;
 import com.example.onboardingservice.web.httpData.note.*;
+import com.example.onboardingservice.web.httpData.report.ReportDeleteResponse;
 import com.example.onboardingservice.web.httpData.report.ReportGetByIdResponse;
 import com.example.onboardingservice.web.httpData.report.ReportGetResponse;
 import com.example.onboardingservice.web.util.RequestData;
@@ -60,7 +58,7 @@ public class ReportController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         log.info("returning_reports: " + clientEmail);
-        var reports = reportService.listReports(clientEmail);
+        var reports = reportService.listReportsWithImages(clientEmail);
         var response = ReportGetResponse.builder()
                 .reports(reports)
                 .build();
@@ -166,6 +164,26 @@ public class ReportController {
             return ResponseEntity.ok(reportZipped);
         } catch (DownloadingImagesException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ReportDeleteResponse> deleteReport(
+            @RequestBody(description = "Id of the report to delete", required = true)
+            @PathVariable("id") Long id) {
+        if (id == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        log.info("deleting_report: " + id);
+        try {
+            var reports = reportService.deleteReportById(id);
+            var response = ReportDeleteResponse.builder()
+                    .reports(reports)
+                    .build();
+            return ResponseEntity.ok(response);
+        } catch (ReportNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 

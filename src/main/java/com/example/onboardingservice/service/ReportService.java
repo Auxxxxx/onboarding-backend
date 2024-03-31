@@ -1,8 +1,12 @@
 package com.example.onboardingservice.service;
 
+import com.example.onboardingservice.exception.JsonTooLongException;
 import com.example.onboardingservice.exception.ReportNotFoundException;
 import com.example.onboardingservice.exception.UserNotFoundException;
+import com.example.onboardingservice.exception.WrongListSize;
 import com.example.onboardingservice.model.Client;
+import com.example.onboardingservice.model.Note;
+import com.example.onboardingservice.model.NoteType;
 import com.example.onboardingservice.model.Report;
 import com.example.onboardingservice.model.dto.ReportWithImagesDto;
 import com.example.onboardingservice.repository.ReportRepository;
@@ -10,6 +14,7 @@ import com.example.onboardingservice.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -25,9 +30,16 @@ public class ReportService {
     private final ImageService imageService;
     private static final int BYTES_PER_KILOBYTE = 1000;
 
-    public List<ReportWithImagesDto> listReports(String email) {
+    private List<Report> listReports(String email) {
         List<Report> reports = reportRepository.findByRecipient(email);
         return reports.stream()
+                .filter(report -> report.getRemovedAt() == null)
+                .sorted((r1, r2) -> r2.getDate().compareTo(r1.getDate()))
+                .toList();
+    }
+
+    public List<ReportWithImagesDto> listReportsWithImages(String email) {
+        return listReports(email).stream()
                 .map(report -> {
                     List<String> imageUrls = imageService.getPaidAdvertisingReport(email, report.getId());
                     long sizeBytes = imageService.getPaidAdvertisingReportSize(email, report.getId());
@@ -61,5 +73,13 @@ public class ReportService {
         Report saved = reportRepository.save(report);
         Long reportId = saved.getId();
         imageService.uploadPaidAdvertisingReport(files, clientEmail, reportId);
+    }
+
+    @Transactional
+    public List<Report> deleteReportById(Long id) throws ReportNotFoundException {
+        Report report = reportRepository.findById(id).orElseThrow(ReportNotFoundException::new);
+        report.setRemovedAt(LocalDate.now());
+        reportRepository.save(report);
+        return listReports(report.getRecipient().getEmail());
     }
 }

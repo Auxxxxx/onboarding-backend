@@ -19,7 +19,6 @@ public class Report implements Serializable {
     @Id
     @GeneratedValue
     @ToString.Include
-    @JsonIgnore
     private Long id;
     @Schema(example = "Report on advertisement in Facebook")
     private String name;
@@ -29,4 +28,6 @@ public class Report implements Serializable {
     @ManyToOne(fetch=FetchType.EAGER)
     @JoinColumn(name = "client_id", referencedColumnName = "id")
     private Client recipient;
+    @JsonIgnore
+    private LocalDate removedAt;
 }

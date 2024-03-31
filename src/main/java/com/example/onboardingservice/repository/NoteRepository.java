@@ -10,10 +10,10 @@ import java.util.Optional;
 
 public interface NoteRepository extends JpaRepository<Note, Long> {
 
-    @Query("select n from Note n where n.recipient.email = :email and n.noteType = :noteType")
+    @Query("select n from Note n where n.recipient.email = :email and n.noteType = :noteType and n.removedAt is null")
     List<Note> findByRecipientAndNoteType(String email, NoteType noteType);
 
-    @Query("select n from Note n where n.recipient.email = :email and n.noteType = 0 and n.id = :id")
+    @Query("select n from Note n where n.recipient.email = :email and n.noteType = 0 and n.id = :id and n.removedAt is null")
     Optional<Note> findMeetingNoteByRecipientAndId(String email, Long id);
 
 }

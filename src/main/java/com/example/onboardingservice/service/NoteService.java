@@ -1,9 +1,6 @@
 package com.example.onboardingservice.service;
 
-import com.example.onboardingservice.exception.JsonTooLongException;
-import com.example.onboardingservice.exception.NoteNotFoundException;
-import com.example.onboardingservice.exception.UserNotFoundException;
-import com.example.onboardingservice.exception.WrongListSize;
+import com.example.onboardingservice.exception.*;
 import com.example.onboardingservice.model.Client;
 import com.example.onboardingservice.model.Note;
 import com.example.onboardingservice.model.NoteType;
@@ -24,7 +21,12 @@ public class NoteService {
     private final UserService userService;
 
     public List<Note> listMeetingNotes(String email) {
-        return noteRepository.findByRecipientAndNoteType(email, NoteType.MEETING_NOTES);
+        return noteRepository
+                .findByRecipientAndNoteType(email, NoteType.MEETING_NOTES)
+                .stream()
+                .filter(note -> note.getRemovedAt() == null)
+                .sorted((n1, n2) -> n2.getDate().compareTo(n1.getDate()))
+                .toList();
     }
 
     public Note findMeetingNoteById(String email, Long noteId) throws NoteNotFoundException {
@@ -105,13 +107,14 @@ public class NoteService {
 
     @Transactional
     public List<Note> deleteMeetingNoteById(Long id)
-            throws JsonTooLongException, WrongListSize {
-        Note note = noteRepository.findById(id).orElseThrow(JsonTooLongException::new);
+            throws NoteNotFoundException, NoteCannotBeDeletedException {
+        Note note = noteRepository.findById(id).orElseThrow(NoteNotFoundException::new);
         if (note.getNoteType() == NoteType.MEETING_NOTES) {
-            noteRepository.deleteById(id);
+            note.setRemovedAt(LocalDate.now());
+            noteRepository.save(note);
             return listMeetingNotes(note.getRecipient().getEmail());
         } else {
-            throw new WrongListSize();
+            throw new NoteCannotBeDeletedException();
         }
     }
 }

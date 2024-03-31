@@ -31,4 +31,6 @@ public class Note implements Serializable {
     @ManyToOne(fetch=FetchType.EAGER)
     @JoinColumn(name = "client_id", referencedColumnName = "id")
     private Client recipient;
+    @JsonIgnore
+    private LocalDate removedAt;
 }
