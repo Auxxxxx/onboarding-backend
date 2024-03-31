@@ -5,6 +5,7 @@ import com.example.onboardingservice.exception.NoteNotFoundException;
 import com.example.onboardingservice.exception.UserNotFoundException;
 import com.example.onboardingservice.exception.WrongListSize;
 import com.example.onboardingservice.model.Note;
+import com.example.onboardingservice.model.Role;
 import com.example.onboardingservice.model.User;
 import com.example.onboardingservice.service.NoteService;
 import com.example.onboardingservice.web.httpData.note.*;
@@ -45,7 +46,7 @@ public class NoteController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!user.getEmail().equals(clientEmail)) {
+        if (user.getRole() == Role.CLIENT && !user.getEmail().equals(clientEmail)) {
             log.error("returning_meeting_notes: " + clientEmail + " by: " + user.getEmail());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
@@ -73,7 +74,7 @@ public class NoteController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!user.getEmail().equals(clientEmail)) {
+        if (user.getRole() == Role.CLIENT && !user.getEmail().equals(clientEmail)) {
             log.error("returning_meeting_note_by_id: " + clientEmail + " by: " + user.getEmail());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
@@ -105,7 +106,7 @@ public class NoteController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!user.getEmail().equals(clientEmail)) {
+        if (user.getRole() == Role.CLIENT && !user.getEmail().equals(clientEmail)) {
             log.error("returning_useful_info: " + clientEmail + " by: " + user.getEmail());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
@@ -137,7 +138,7 @@ public class NoteController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!user.getEmail().equals(clientEmail)) {
+        if (user.getRole() == Role.CLIENT && !user.getEmail().equals(clientEmail)) {
             log.error("returning_contact_details: " + clientEmail + " by: " + user.getEmail());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }

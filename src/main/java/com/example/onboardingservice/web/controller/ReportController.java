@@ -4,6 +4,7 @@ import com.example.onboardingservice.exception.DownloadingImagesException;
 import com.example.onboardingservice.exception.NoteNotFoundException;
 import com.example.onboardingservice.exception.ReportNotFoundException;
 import com.example.onboardingservice.exception.UserNotFoundException;
+import com.example.onboardingservice.model.Role;
 import com.example.onboardingservice.model.User;
 import com.example.onboardingservice.service.ImageService;
 import com.example.onboardingservice.service.NoteService;
@@ -39,11 +40,11 @@ public class ReportController {
     private final ReportService reportService;
     private final ImageService imageService;
 
-    @Secured("MANAGER")
+
     @Operation(summary = "Get reports", description = "Lists all reports for the client")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Fetched successfully"),
-            @ApiResponse(responseCode = "403", description = "Forbidden. Accessible only for MANAGER"),
+            @ApiResponse(responseCode = "403", description = "Forbidden. A client is trying to get another client's data"),
             @ApiResponse(responseCode = "400", description = "Bad Request. Request field is null")
     })
     @GetMapping("/{clientEmail}")
@@ -53,6 +54,11 @@ public class ReportController {
         if (clientEmail == null || clientEmail.isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (user.getRole() == Role.CLIENT && !user.getEmail().equals(clientEmail)) {
+            log.error("returning_reports: " + clientEmail + " by: " + user.getEmail());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         log.info("returning_reports: " + clientEmail);
         var reports = reportService.listReports(clientEmail);
         var response = ReportGetResponse.builder()
@@ -61,11 +67,11 @@ public class ReportController {
         return ResponseEntity.ok(response);
     }
 
-    @Secured("MANAGER")
+
     @Operation(summary = "Get report by id", description = "Returns a report by email and id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Fetched successfully"),
-            @ApiResponse(responseCode = "403", description = "Forbidden. Accessible only for MANAGER"),
+            @ApiResponse(responseCode = "403", description = "Forbidden. A client is trying to get another client's data"),
             @ApiResponse(responseCode = "400", description = "Bad Request. Request field is null")
     })
     @GetMapping("/{clientEmail}/{reportId}")
@@ -76,6 +82,11 @@ public class ReportController {
             @PathVariable("reportId") Long reportId) {
         if (clientEmail == null || clientEmail.isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (user.getRole() == Role.CLIENT && !user.getEmail().equals(clientEmail)) {
+            log.error("returning_report_by_id: " + clientEmail + " by: " + user.getEmail());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         log.info("returning_report_by_id: " + clientEmail);
         try {
@@ -127,11 +138,10 @@ public class ReportController {
         }
     }
 
-    @Secured("MANAGER")
     @Operation(summary = "Get a report zipped", description = "Get zip archive with report for this client.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Fetched successfully"),
-            @ApiResponse(responseCode = "403", description = "Forbidden. Accessible only for MANAGER"),
+            @ApiResponse(responseCode = "403", description = "Forbidden. A client is trying to get another client's data"),
             @ApiResponse(responseCode = "400", description = "Bad Request. No client specified"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error. Failed to download objects")
     })
@@ -144,6 +154,11 @@ public class ReportController {
             @PathVariable("reportId") Long reportId) {
         if (clientEmail == null || clientEmail.isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (user.getRole() == Role.CLIENT && !user.getEmail().equals(clientEmail)) {
+            log.error("fetching_report_zipped: " + clientEmail + " by: " + user.getEmail());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         log.info("fetching_report_zipped: " + clientEmail);
         try {

@@ -8,8 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriUtils;
 
 import java.io.*;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -69,7 +71,7 @@ public class ImageService {
         List<S3ObjectSummary> summaries = getImageSummaries(dirPath);
 
         return summaries.stream()
-                .map(summary -> baseUrl + summary.getKey().replaceAll(" ", "%"))
+                .map(summary -> baseUrl + UriUtils.encode(summary.getKey(), "UTF-8"))
                 .collect(Collectors.toList());
     }
 

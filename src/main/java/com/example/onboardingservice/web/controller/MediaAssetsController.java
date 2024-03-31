@@ -1,6 +1,7 @@
 package com.example.onboardingservice.web.controller;
 
 import com.example.onboardingservice.exception.DownloadingImagesException;
+import com.example.onboardingservice.model.Role;
 import com.example.onboardingservice.model.User;
 import com.example.onboardingservice.service.ImageService;
 import com.example.onboardingservice.web.httpData.mediaAssets.MediaAssetsGetResponse;
@@ -49,7 +50,7 @@ public class MediaAssetsController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!user.getEmail().equals(clientEmail)) {
+        if (user.getRole() == Role.CLIENT && !user.getEmail().equals(clientEmail)) {
             log.error("saving_media_assets: " + clientEmail + " by: " + user.getEmail());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
