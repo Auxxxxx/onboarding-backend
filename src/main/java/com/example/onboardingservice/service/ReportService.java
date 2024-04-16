@@ -63,6 +63,7 @@ public class ReportService {
                 .build();
     }
 
+    @Transactional
     public void save(String clientEmail, String name, MultipartFile[] files) throws UserNotFoundException, IOException {
         Client recipient = (Client) userService.findByEmail(clientEmail);
         Report report = Report.builder()

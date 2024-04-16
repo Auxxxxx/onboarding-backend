@@ -111,7 +111,7 @@ public class ClientController {
         }
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (user.getRole() == Role.CLIENT && !user.getEmail().equals(clientEmail)) {
-            log.error("returning_client: " + clientEmail + " by: " + user.getEmail());
+            log.error("updating_client: " + clientEmail + " by: " + user.getEmail());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         log.info("updating_client: " + clientEmail);

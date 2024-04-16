@@ -133,6 +133,16 @@
             <artifactId>aws-java-sdk-s3</artifactId>
             <version>1.12.655</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.opentable.components/otj-pg-embedded -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>1.19.6</version>
+            <scope>test</scope>
+        </dependency>
+
+
+
     </dependencies>
 
     <dependencyManagement>

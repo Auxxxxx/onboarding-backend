@@ -43,6 +43,7 @@ public class NoteService {
         return found.stream().findAny().orElseThrow(NoteNotFoundException::new);
     }
 
+    @Transactional
     public void saveMeetingNote(Long id,
                                 String content,
                                 String header,
@@ -61,6 +62,7 @@ public class NoteService {
         noteRepository.save(note);
     }
 
+    @Transactional
     public void saveUsefulInfo(String recipientEmail,
                                String content) throws UserNotFoundException {
         Note existing = noteRepository.findByRecipientAndNoteType(
@@ -72,6 +74,7 @@ public class NoteService {
         noteRepository.save(existing);
     }
 
+    @Transactional
     public void saveContactDetails(String recipientEmail,
                                    String content) throws UserNotFoundException {
         Note existing = noteRepository.findByRecipientAndNoteType(
@@ -83,10 +86,12 @@ public class NoteService {
         noteRepository.save(existing);
     }
 
+
     private void save(Note note) {
         noteRepository.save(note);
     }
 
+    @Transactional
     public void addDefaultNotes(Client client) throws UserNotFoundException {
         NoteType[] types = NoteType.values();
         for (NoteType type : types) {

@@ -29,10 +29,12 @@ public class UserService {
                 .orElseThrow(UserNotFoundException::new);
     }
 
+    @Transactional
     public void save(User user) {
         userRepository.save(user);
     }
 
+    @Transactional
     public void updateClient(
             String email,
             String fullName,

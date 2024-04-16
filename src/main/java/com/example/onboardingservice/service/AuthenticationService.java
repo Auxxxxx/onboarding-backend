@@ -12,6 +12,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 
@@ -24,6 +26,7 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public void register(String fullName, String email, String password) throws UserAlreadyExistsException {
         if (userRepository.findByEmail(email).isPresent()) {
             throw new UserAlreadyExistsException();

@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriUtils;
 
@@ -29,13 +31,16 @@ public class ImageService {
     private String bucket;
     private final AmazonS3 s3;
 
+    @Transactional
     public void uploadMediaAssets(MultipartFile[] files, String clientEmail) throws IOException {
         saveImages(files, "media-assets", clientEmail);
     }
 
+    @Transactional
     public void uploadPaidAdvertisingReport(MultipartFile[] files, String clientEmail, Long reportId) throws IOException {
         saveImages(files,"paid-advertising-reports", clientEmail, reportId.toString());
     }
+
 
     private void saveImages(MultipartFile[] files, String... dirPath) throws IOException {
         for (MultipartFile file : files) {
